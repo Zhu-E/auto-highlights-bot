@@ -33,33 +33,34 @@ def download_video(url, folder_path, file_name):
         print(f"Error downloading video: {e}")
 
 
+def download_from_page(folder_path, file_name, url):
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+
+    # Initialize the ChromeDriver with the desired options
+    driver = webdriver.Chrome(options=chrome_options)
+
+    driver.get(url)
+
+    html1 = driver.page_source
+    driver.quit()
+    soup = BeautifulSoup(html1, "html.parser")
+
+    # Find the <video> element
+    video_tag = soup.find("video")
+
+    # If <video> tag is found, extract the modified 'src' attribute (URL)
+    if video_tag:
+        url2 = video_tag['src']
+        print("Modified URL found:", url2)
+        download_video(url2, folder_path, file_name)
+    else:
+        print("<video> tag not found.")
+    print("working")
+
+
 # download_video(url, folder_path, file_name)
-# Set up ChromeOptions to run in headless mode
-folder_path = "./clips"
-file_name = "video_name21321412.mp4"
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-
-# Initialize the ChromeDriver with the desired options
-driver = webdriver.Chrome(options=chrome_options)
-
-driver.get("https://www.twitch.tv/k3soju/clip/BetterEnthusiasticShieldKeepo-zJRaVPigEARJTXNx")
-
-html1 = driver.page_source
-driver.quit()
-soup = BeautifulSoup(html1, "html.parser")
-
-# Find the <video> element
-video_tag = soup.find("video")
-
-# If <video> tag is found, extract the modified 'src' attribute (URL)
-if video_tag:
-    url = video_tag['src']
-    print("Modified URL found:", url)
-    download_video(url, folder_path, file_name)
-else:
-    print("<video> tag not found.")
-print("working")
-
-
-
+folder_path1 = "./clips"
+file_name1 = "video_name21321412.mp4"
+link = "https://www.twitch.tv/k3soju/clip/BetterEnthusiasticShieldKeepo-zJRaVPigEARJTXNx"
+download_from_page(folder_path1, file_name1, link)
