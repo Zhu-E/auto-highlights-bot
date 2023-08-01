@@ -1,7 +1,6 @@
 from seleniumbase import BaseCase
 import requests
 import urllib.request
-import os
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import ssl
@@ -10,6 +9,8 @@ from selenium.webdriver.chrome.options import Options
 import time
 from bs4 import BeautifulSoup
 import glob
+from moviepy.editor import VideoFileClip, concatenate_videoclips
+import os
 
 
 def download_video(url, folder_path, file_name):
@@ -88,8 +89,35 @@ def download_category(folder_path, url):
         download_from_page(folder_path, name, str(file))
 
 
+def combine_mp4_files(folder_path, output_file):
+    video_clips = []
+
+    # Get a list of all MP4 files in the folder
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".mp4"):
+            file_path = os.path.join(folder_path, filename)
+            clip = VideoFileClip(file_path)
+            video_clips.append(clip)
+
+    # Concatenate the video clips into one long video
+    final_clip = concatenate_videoclips(video_clips, method="compose")
+
+    # Save the combined video to the specified output file
+    final_clip.write_videofile(output_file)
+
+    # Close the clips to free up resources
+    for clip in video_clips:
+        clip.close()
+
+    # Close the final_clip
+    final_clip.close()
+
+
 link = "https://www.twitch.tv/directory/game/Teamfight%20Tactics/clips?range=7d"
 folder_path1="./clips"
 download_category(folder_path1, link)
+folder_path = "./clips"   # Replace with the path to your folder containing the MP4 files
+output_file = "combined_video.mp4"   # Replace with the desired output file name
+combine_mp4_files(folder_path, output_file)
 #
 # print(clip_urls)
