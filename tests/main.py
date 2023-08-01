@@ -42,7 +42,7 @@ def download_from_page(folder_path, file_name, url):
     driver = webdriver.Chrome(options=chrome_options)
 
     driver.get(url)
-
+    time.sleep(1)
     html1 = driver.page_source
     driver.quit()
     soup = BeautifulSoup(html1, "html.parser")
@@ -60,42 +60,36 @@ def download_from_page(folder_path, file_name, url):
     print("working")
 
 
-# download_video(url, folder_path, file_name)
-folder_path1 = "./clips"
-file_name1 = "video_name21321412.mp4"
-# link = "https://www.twitch.tv/k3soju/clip/BetterEnthusiasticShieldKeepo-zJRaVPigEARJTXNx"
-# download_from_page(folder_path1, file_name1, link)
+def download_category(folder_path, url):
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    # Initialize the ChromeDriver with the desired options
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.get(url)
 
-chrome_options = Options()
-chrome_options.add_argument("--headless")
+    html1 = driver.page_source
+    driver.quit()
+    # print(html1)
+    soup = BeautifulSoup(html1, "html.parser")
 
-# Initialize the ChromeDriver with the desired options
-driver = webdriver.Chrome(options=chrome_options)
+    # Find all the elements containing the clip URLs (adjust the specific elements if needed)
+    clip_elements = soup.find_all("a", class_="ScCoreLink-sc-16kq0mq-0 eYjhIv ScCoreLink-sc-bhsr9c-0 jYyMcQ tw-link")
+
+    # Extract the URLs from the elements and store them in a list
+    clip_urls = [clip["href"] for clip in clip_elements]
+    for val in range(len(clip_urls)):
+        clip_urls[val] = "https://www.twitch.tv"+clip_urls[val]
+    # Print the list of URLs
+
+    clipname = 0
+    for file in clip_urls:
+        clipname += 1
+        name = "clip"+str(clipname)+".mp4"
+        download_from_page(folder_path, name, str(file))
+
+
 link = "https://www.twitch.tv/directory/game/Teamfight%20Tactics/clips?range=7d"
-driver.get(link)
-
-html1 = driver.page_source
-driver.quit()
-# print(html1)
-soup = BeautifulSoup(html1, "html.parser")
-
-# Find all the elements containing the clip URLs (adjust the specific elements if needed)
-clip_elements = soup.find_all("a", class_="ScCoreLink-sc-16kq0mq-0 eYjhIv ScCoreLink-sc-bhsr9c-0 jYyMcQ tw-link")
-
-# Extract the URLs from the elements and store them in a list
-clip_urls = [clip["href"] for clip in clip_elements]
-for val in range(len(clip_urls)):
-    clip_urls[val] = "https://www.twitch.tv"+clip_urls[val]
-# Print the list of URLs
-
-clipname = 0
-for file in clip_urls:
-    clipname += 1
-    name = "clip"+str(clipname)+".mp4"
-    download_from_page(folder_path1, name, str(file))
-
-
-
-
+folder_path1="./clips"
+download_category(folder_path1, link)
 #
 # print(clip_urls)
